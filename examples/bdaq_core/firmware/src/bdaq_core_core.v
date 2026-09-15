@@ -23,22 +23,45 @@ module bdaq_core_core(
         output reg          FIFO_VALID,
         output reg [31:0]   FIFO_DATA,
 
-        output wire [7:0]   GPIO
+        output wire [7:0]   GPIO1,        
+        input wire [7:0]   GPIO2
     );
 
 
     /* -------  MODULE ADREESSES  ------- */
-    localparam GPIO_BASEADDR = 32'h1000;
-    localparam GPIO_HIGHADDR = 32'h101f;
+    localparam GPIO1_BASEADDR = 32'h1000;
+    localparam GPIO1_HIGHADDR = 32'h101f;
 
 
     /* -------  USER MODULES  ------- */
     gpio #(
-        .BASEADDR(GPIO_BASEADDR),
-        .HIGHADDR(GPIO_HIGHADDR),
+        .BASEADDR(GPIO1_BASEADDR),
+        .HIGHADDR(GPIO1_HIGHADDR),
         .ABUSWIDTH(32),
         .IO_WIDTH(8),
         .IO_DIRECTION(8'hff)
+    ) i_gpio1_rx (
+        .BUS_CLK(BUS_CLK),
+        .BUS_RST(BUS_RST),
+        .BUS_ADD(BUS_ADD),
+        .BUS_DATA(BUS_DATA[7:0]),
+        .BUS_RD(BUS_RD),
+        .BUS_WR(BUS_WR),
+        .IO(GPIO1)
+    );
+
+    /* -------  MODULE ADREESSES  ------- */
+    localparam GPIO2_BASEADDR = 32'h1020;
+    localparam GPIO2_HIGHADDR = 32'h103f;
+
+
+    /* -------  USER MODULES  ------- */
+    gpio #(
+        .BASEADDR(GPIO2_BASEADDR),
+        .HIGHADDR(GPIO2_HIGHADDR),
+        .ABUSWIDTH(32),
+        .IO_WIDTH(8),
+        .IO_DIRECTION(8'h00)
     ) i_gpio_rx (
         .BUS_CLK(BUS_CLK),
         .BUS_RST(BUS_RST),
@@ -46,11 +69,11 @@ module bdaq_core_core(
         .BUS_DATA(BUS_DATA[7:0]),
         .BUS_RD(BUS_RD),
         .BUS_WR(BUS_WR),
-        .IO(GPIO)
+        .IO(GPIO2)
     );
 
     wire EN;
-    assign EN = GPIO[0];
+    assign EN = GPIO1[0];
 
     reg [31:0] FIFO_DATA_REG = 0;
 

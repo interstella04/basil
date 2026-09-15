@@ -13,19 +13,22 @@ import numpy as np
 
 from basil.dut import Dut
 
-chip = Dut("bdaq53_eth.yaml")
+chip = Dut("bdaq_core.yaml")
 chip.init()
 
-chip["CONTROL"]["EN"] = 0
-chip["CONTROL"].write()
+chip["GPIO1"]["LED"] = 0 
+chip["GPIO1"].write()
 
-logging.info("Starting data test ...")
+for i in range(100):
+    chip["GPIO1"]["LED"] = i
+    chip["GPIO1"].write()
+    time.sleep(0.1)
+    chip["GPIO2"].read()
+    print(chip["GPIO2"]["LOOP_BACK"].tovalue())
 
-chip["CONTROL"]["EN"] = 1
-chip["CONTROL"].write()
 
-start = 0
 
+""" start = 0
 for i in range(10):
     time.sleep(1)
 
@@ -37,8 +40,8 @@ for i in range(10):
     logging.info("%s: %.2f Mbits checked. OK?: %s" % (i, float(32 * data_size) / pow(10, 6), comp.all()))
     start += data_size
 
-chip["CONTROL"]["EN"] = 0  # stop data source
-chip["CONTROL"].write()
+chip["GPIO1"]["LED"] = 0  # stop data source
+chip["GPIO1"].write()
 
 logging.info("Starting speed test ...")
 
@@ -48,8 +51,8 @@ tick = 0
 tick_old = 0
 start_time = time.time()
 
-chip["CONTROL"]["EN"] = 1
-chip["CONTROL"].write()
+chip["GPIO1"]["LED"] = 1
+chip["GPIO1"].write()
 
 while time.time() - start_time < testduration:
     data = chip["FIFO"].get_data()
@@ -60,9 +63,10 @@ while time.time() - start_time < testduration:
         logging.info("Time: %f s" % (time.time() - start_time))
         tick_old = tick
 
-chip["CONTROL"]["EN"] = 0x0  # stop data source
-chip["CONTROL"].write()
+chip["GPIO1"]["LED"] = 0x0  # stop data source
+chip["GPIO1"].write()
 
 logging.info(
     "Bytes received: %s, average data rate: %s Mbit/s" % (total_len, round((total_len / 1e6 / testduration), 2))
 )
+ """

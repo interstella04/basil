@@ -15,10 +15,16 @@ transfer_layer:
         tcp_connection : True
 
 hw_drivers:
-  - name      : GPIO_DRV
+  - name      : GPIO1
     type      : gpio
     interface : intf
     base_addr : 0x1000
+    size      : 8
+
+  - name      : GPIO2
+    type      : gpio
+    interface : intf
+    base_addr : 0x1020
     size      : 8
 
   - name      : FIFO
@@ -28,11 +34,21 @@ hw_drivers:
     base_data_addr : 0x100000000
 
 registers:
-  - name        : CONTROL
+  - name        : GPIO1
     type        : StdRegister
-    hw_driver   : GPIO_DRV
+    hw_driver   : GPIO1
     size        : 8
     fields:
-      - name    : EN
-        size    : 1
-        offset  : 0
+      - name    : LED
+        size    : 8
+        offset  : 7
+
+  - name        : GPIO2
+    type        : StdRegister
+    hw_driver   : GPIO2
+    size        : 8
+    fields:
+      - name    : LOOP_BACK
+        size    : 8
+        offset  : 7
+

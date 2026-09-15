@@ -270,7 +270,8 @@ module bdaq_core_throughput_test(
     );
 
 
-    wire [7:0] GPIO;
+    wire [7:0] GPIO1;
+    wire [7:0] GPIO2;
 
     bdaq_core_core i_bdaq_core_core(
         .RESET_N(RESET_N),
@@ -289,8 +290,16 @@ module bdaq_core_throughput_test(
         .FIFO_DATA(FIFO_DATA),
         .FIFO_VALID(fifo_write),
 
-        .GPIO(GPIO)
+        .GPIO1(GPIO1),        
+        .GPIO2(GPIO2)
     );
+
+    //assign LED = ~{ TCP_OPEN_ACK, TCP_CLOSE_REQ, TCP_RX_WR, TCP_TX_WR,
+    //        fifo_full, fifo_empty, fifo_write, TCP_TX_WR};    
+            
+    assign LED[7:0] = ~GPIO1[7:0];    
+
+    assign GPIO2[7:0] = GPIO1[7:0];
 
 
     assign TCP_TX_WR = !TCP_TX_FULL && !fifo_empty;
@@ -302,7 +311,7 @@ module bdaq_core_throughput_test(
     always @(posedge BUS_CLK)
     begin
         // wait for start condition
-        ETH_START_SENDING <= GPIO[0];    //TCP_OPEN_ACK;
+        ETH_START_SENDING <= GPIO1[0];    //TCP_OPEN_ACK;
 
         if(ETH_START_SENDING && !ETH_START_SENDING_temp)
             ETH_START_SENDING_LOCK <= 1;
@@ -323,12 +332,11 @@ module bdaq_core_throughput_test(
             fifo_next <= 1'b0;
 
         // stop, if connection is closed by host
-        if(TCP_CLOSE_REQ || !GPIO[0]) begin
+        if(TCP_CLOSE_REQ || !GPIO1[0]) begin
             ETH_START_SENDING_LOCK <= 0;
         end
     end
 
-    assign LED = ~{ TCP_OPEN_ACK, TCP_CLOSE_REQ, TCP_RX_WR, TCP_TX_WR,
-            fifo_full, fifo_empty, fifo_write, TCP_TX_WR};
+
 
 endmodule
