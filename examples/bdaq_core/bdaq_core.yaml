@@ -27,6 +27,18 @@ hw_drivers:
     base_addr : 0x1020
     size      : 8
 
+  - name      : GPIO_TXI
+    type      : gpio
+    interface : intf
+    base_addr : 0x1040
+    size      : 8
+
+  - name      : GPIO_RXI
+    type      : gpio
+    interface : intf
+    base_addr : 0x1060
+    size      : 8
+
   - name      : FIFO
     type      : sitcp_fifo
     interface : intf
@@ -49,6 +61,24 @@ registers:
     size        : 8
     fields:
       - name    : LOOP_BACK
+        size    : 8
+        offset  : 7
+
+  - name        : GPIO_TXI
+    type        : StdRegister
+    hw_driver   : GPIO_TXI
+    size        : 8
+    fields:
+      - name    : TXI
+        size    : 8
+        offset  : 7
+
+  - name        : GPIO_RXI
+    type        : StdRegister
+    hw_driver   : GPIO_RXI
+    size        : 8
+    fields:
+      - name    : RXI
         size    : 8
         offset  : 7
 

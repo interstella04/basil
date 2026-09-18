@@ -24,7 +24,11 @@ module bdaq_core_core(
         output reg [31:0]   FIFO_DATA,
 
         output wire [7:0]   GPIO1,        
-        input wire [7:0]   GPIO2
+        input wire [7:0]   GPIO2,
+
+        // Lemo Connectors
+        output wire [7:0] GPIO_TXI,
+        input wire [7:0] GPIO_RXI
     );
 
 
@@ -61,8 +65,8 @@ module bdaq_core_core(
         .HIGHADDR(GPIO2_HIGHADDR),
         .ABUSWIDTH(32),
         .IO_WIDTH(8),
-        .IO_DIRECTION(8'h00)
-    ) i_gpio_rx (
+        .IO_DIRECTION(8'h00) // all 8 bits are considered as inputs
+    ) i_gpio2_rx (
         .BUS_CLK(BUS_CLK),
         .BUS_RST(BUS_RST),
         .BUS_ADD(BUS_ADD),
@@ -72,6 +76,54 @@ module bdaq_core_core(
         .IO(GPIO2)
     );
 
+    // LEMO CONNECTORS
+
+    /* -------  MODULE ADREESSES  ------- */
+    localparam GPIO_TXI_BASEADDR = 32'h1040;
+    localparam GPIO_TXI_HIGHADDR = 32'h105f;
+
+
+    /* -------  USER MODULES  ------- */
+    gpio #(
+        .BASEADDR(GPIO_TXI_BASEADDR),
+        .HIGHADDR(GPIO_TXI_HIGHADDR),
+        .ABUSWIDTH(32),
+        .IO_WIDTH(8),
+        .IO_DIRECTION(8'hff) // all 8 bits are considered as outputs
+    ) i_gpio_txi (
+        .BUS_CLK(BUS_CLK),
+        .BUS_RST(BUS_RST),
+        .BUS_ADD(BUS_ADD),
+        .BUS_DATA(BUS_DATA[7:0]),
+        .BUS_RD(BUS_RD),
+        .BUS_WR(BUS_WR),
+        .IO(GPIO_TXI)
+    );
+
+    
+    /* -------  MODULE ADREESSES  ------- */
+    localparam GPIO_RXI_BASEADDR = 32'h1060;
+    localparam GPIO_RXI_HIGHADDR = 32'h107f;
+
+
+    /* -------  USER MODULES  ------- */
+    gpio #(
+        .BASEADDR(GPIO_RXI_BASEADDR),
+        .HIGHADDR(GPIO_RXI_HIGHADDR),
+        .ABUSWIDTH(32),
+        .IO_WIDTH(8),
+        .IO_DIRECTION(8'h00) // all 8 bits are considered as input
+    ) i_gpio_rxi (
+        .BUS_CLK(BUS_CLK),
+        .BUS_RST(BUS_RST),
+        .BUS_ADD(BUS_ADD),
+        .BUS_DATA(BUS_DATA[7:0]),
+        .BUS_RD(BUS_RD),
+        .BUS_WR(BUS_WR),
+        .IO(GPIO_RXI)
+    );
+
+   
     wire EN;
     assign EN = GPIO1[0];
 
@@ -89,5 +141,6 @@ module bdaq_core_core(
             FIFO_DATA_REG <= 0;
             FIFO_VALID <= 0;
         end
+    
 
 endmodule

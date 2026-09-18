@@ -89,3 +89,18 @@ set_property SLEW SLOW [get_ports LED*]
 set_property CONFIG_MODE SPIx4 [current_design]
 set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
 set_property BITSTREAM.CONFIG.CONFIGRATE 33 [current_design]
+
+# LEMO Connectors
+# Receive
+set_property PACKAGE_PIN AC21 [get_ports {RXI[0]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {RXI[0]}]
+
+set_property PACKAGE_PIN AE25 [get_ports {RXI[1]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {RXI[1]}]
+
+# Transmit
+set_property PACKAGE_PIN AB21 [get_ports {TXI[0]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {TXI[0]}]
+
+set_property PACKAGE_PIN AD25 [get_ports {TXI[1]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {TXI[1]}]
