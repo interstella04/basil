@@ -27,13 +27,13 @@ hw_drivers:
     base_addr : 0x1020
     size      : 8
 
-  - name      : GPIO_TXI
+  - name      : OUT_LEMO
     type      : gpio
     interface : intf
     base_addr : 0x1040
     size      : 8
 
-  - name      : GPIO_RXI
+  - name      : IN_LEMO
     type      : gpio
     interface : intf
     base_addr : 0x1060
@@ -64,21 +64,21 @@ registers:
         size    : 8
         offset  : 7
 
-  - name        : GPIO_TXI
+  - name        : OUT_LEMO
     type        : StdRegister
-    hw_driver   : GPIO_TXI
+    hw_driver   : OUT_LEMO
     size        : 8
     fields:
       - name    : TXI
-        size    : 8
-        offset  : 7
+        size    : 2
+        offset  : 1
 
-  - name        : GPIO_RXI
+  - name        : IN_LEMO
     type        : StdRegister
-    hw_driver   : GPIO_RXI
+    hw_driver   : IN_LEMO
     size        : 8
     fields:
       - name    : RXI
-        size    : 8
-        offset  : 7
+        size    : 2
+        offset  : 1
 
