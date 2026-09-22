@@ -104,3 +104,17 @@ set_property IOSTANDARD LVCMOS33 [get_ports {TXI[0]}]
 
 set_property PACKAGE_PIN AD25 [get_ports {TXI[1]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {TXI[1]}]
+
+# GPIO Connector
+# GPIO0
+set_property PACKAGE_PIN W25 [get_ports {GPIO_IN[0]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {GPIO_IN[0]}]
+# GPIO1
+set_property PACKAGE_PIN W26 [get_ports {GPIO_OUT[0]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {GPIO_OUT[0]}]
+# GPIO2
+set_property PACKAGE_PIN U26 [get_ports {GPIO_IN[1]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {GPIO_IN[1]}]
+# GPIO3
+set_property PACKAGE_PIN V26 [get_ports {GPIO_OUT[1]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {GPIO_OUT[1]}]

@@ -23,12 +23,11 @@ module bdaq_core_core(
         output reg          FIFO_VALID,
         output reg [31:0]   FIFO_DATA,
 
-        output wire [7:0]   GPIO1,        
-        input wire [7:0]   GPIO2,
+        output wire [7:0] GPIO1,
+        input wire [7:0] GPIO2,
 
-        // Lemo Connectors
-        output wire [7:0] GPIO_TXI,
-        input wire [7:0] GPIO_RXI
+        output wire [7:0] OUT0,
+        input wire [7:0] IN0
     );
 
 
@@ -79,14 +78,14 @@ module bdaq_core_core(
     // LEMO CONNECTORS
 
     /* -------  MODULE ADREESSES  ------- */
-    localparam GPIO_TXI_BASEADDR = 32'h1040;
-    localparam GPIO_TXI_HIGHADDR = 32'h105f;
+    localparam OUT0_BASEADDR = 32'h1040;
+    localparam OUT0_HIGHADDR = 32'h105f;
 
 
     /* -------  USER MODULES  ------- */
     gpio #(
-        .BASEADDR(GPIO_TXI_BASEADDR),
-        .HIGHADDR(GPIO_TXI_HIGHADDR),
+        .BASEADDR(OUT0_BASEADDR),
+        .HIGHADDR(OUT0_HIGHADDR),
         .ABUSWIDTH(32),
         .IO_WIDTH(8),
         .IO_DIRECTION(8'hff) // all 8 bits are considered as outputs
@@ -97,19 +96,19 @@ module bdaq_core_core(
         .BUS_DATA(BUS_DATA[7:0]),
         .BUS_RD(BUS_RD),
         .BUS_WR(BUS_WR),
-        .IO(GPIO_TXI)
+        .IO(OUT0)
     );
 
     
     /* -------  MODULE ADREESSES  ------- */
-    localparam GPIO_RXI_BASEADDR = 32'h1060;
-    localparam GPIO_RXI_HIGHADDR = 32'h107f;
+    localparam IN0_BASEADDR = 32'h1060;
+    localparam IN0_HIGHADDR = 32'h107f;
 
 
     /* -------  USER MODULES  ------- */
     gpio #(
-        .BASEADDR(GPIO_RXI_BASEADDR),
-        .HIGHADDR(GPIO_RXI_HIGHADDR),
+        .BASEADDR(IN0_BASEADDR),
+        .HIGHADDR(IN0_HIGHADDR),
         .ABUSWIDTH(32),
         .IO_WIDTH(8),
         .IO_DIRECTION(8'h00) // all 8 bits are considered as input
@@ -120,7 +119,7 @@ module bdaq_core_core(
         .BUS_DATA(BUS_DATA[7:0]),
         .BUS_RD(BUS_RD),
         .BUS_WR(BUS_WR),
-        .IO(GPIO_RXI)
+        .IO(IN0)
     );
 
    

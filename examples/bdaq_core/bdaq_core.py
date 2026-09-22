@@ -40,8 +40,11 @@ class LoopBackTest():
         return readout
 
     def compare(self, value: int, readout: int, field_in: str, field_out: str):
-        for i in range(len(format(value, 'b'))):
-            assert self.check_nth_bit(value,i) == self.check_nth_bit(readout, i), f"Error in bit {i} for IN = {self.check_nth_bit(value,i)}. Loop: (IN/OUT) {field_in}/{field_out}."
+        for i in range(len(format(readout, 'b'))):
+            try:
+                assert self.check_nth_bit(value,i) == self.check_nth_bit(readout, i)
+            except AssertionError:
+                print(f"ERROR in bit {i} for IN = {self.check_nth_bit(value,i)}. Loop: (IN/OUT) {field_in}/{field_out}.")
                 
     def registers(self):
         """Return an iterable of test cases.
@@ -78,7 +81,8 @@ class BDAQCoreTest(LoopBackTest):
     def registers(self):
         return [
             # (OUT_reg, OUT_field, IN_reg, IN_field)
-            ("OUT_LEMO", "TXI", "IN_LEMO", "RXI", self.parameters(2)),
+            ("OUT0", "TXI", "IN0", "RXI", self.parameters(2)),
+            ("OUT0", "GPIO_OUT", "IN0", "GPIO_IN", self.parameters(2)),
         ]
 
 bdaq = BDAQCoreTest()

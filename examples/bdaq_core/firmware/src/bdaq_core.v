@@ -30,7 +30,9 @@ module bdaq_core_throughput_test(
 
         output wire [7:0] LED,
         output wire [1:0] TXI,
-        input wire [1:0] RXI
+        input wire [1:0] RXI,
+        input wire [1:0] GPIO_IN,
+        output wire [1:0] GPIO_OUT
     );
 
     wire RST;
@@ -274,8 +276,8 @@ module bdaq_core_throughput_test(
     wire [7:0] GPIO1;
     wire [7:0] GPIO2;
 
-    wire [1:0] GPIO_TXI;
-    wire [1:0] GPIO_RXI;
+    wire [3:0] OUT0;
+    wire [3:0] IN0;
 
     bdaq_core_core i_bdaq_core_core(
         .RESET_N(RESET_N),
@@ -296,8 +298,8 @@ module bdaq_core_throughput_test(
 
         .GPIO1(GPIO1),        
         .GPIO2(GPIO2),
-        .GPIO_TXI(GPIO_TXI),
-        .GPIO_RXI(GPIO_RXI)
+        .OUT0(OUT0),
+        .IN0(IN0)
     );
 
     //assign LED = ~{ TCP_OPEN_ACK, TCP_CLOSE_REQ, TCP_RX_WR, TCP_TX_WR,
@@ -306,11 +308,15 @@ module bdaq_core_throughput_test(
     assign LED[7:0] = ~GPIO1[7:0];  
     assign GPIO2[7:0] = GPIO1[7:0];
 
-    // Lemo Connection
+    // Lemo Connector
 
-    assign TXI[1:0] = GPIO_TXI[1:0];
+    assign TXI[1:0] = OUT0[1:0];
+    assign IN0[1:0] = RXI[1:0];
 
-    assign GPIO_RXI[1:0] = RXI[1:0];
+    // GPIO Connector
+
+    assign GPIO_OUT[1:0] = OUT0[3:2];
+    assign IN0[3:2] = GPIO_IN[1:0];
 
 
 
