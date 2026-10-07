@@ -23,59 +23,13 @@ module bdaq_core_core(
         output reg          FIFO_VALID,
         output reg [31:0]   FIFO_DATA,
 
-        output wire [7:0] GPIO1,
-        input wire [7:0] GPIO2,
-
         output wire [7:0] OUT0,
-        input wire [7:0] IN0
+        input wire [7:0] IN0,
+
+        output wire [31:0] OUT1,
+        input wire [31:0] IN1,
+
     );
-
-
-    /* -------  MODULE ADREESSES  ------- */
-    localparam GPIO1_BASEADDR = 32'h1000;
-    localparam GPIO1_HIGHADDR = 32'h101f;
-
-
-    /* -------  USER MODULES  ------- */
-    gpio #(
-        .BASEADDR(GPIO1_BASEADDR),
-        .HIGHADDR(GPIO1_HIGHADDR),
-        .ABUSWIDTH(32),
-        .IO_WIDTH(8),
-        .IO_DIRECTION(8'hff)
-    ) i_gpio1_rx (
-        .BUS_CLK(BUS_CLK),
-        .BUS_RST(BUS_RST),
-        .BUS_ADD(BUS_ADD),
-        .BUS_DATA(BUS_DATA[7:0]),
-        .BUS_RD(BUS_RD),
-        .BUS_WR(BUS_WR),
-        .IO(GPIO1)
-    );
-
-    /* -------  MODULE ADREESSES  ------- */
-    localparam GPIO2_BASEADDR = 32'h1020;
-    localparam GPIO2_HIGHADDR = 32'h103f;
-
-
-    /* -------  USER MODULES  ------- */
-    gpio #(
-        .BASEADDR(GPIO2_BASEADDR),
-        .HIGHADDR(GPIO2_HIGHADDR),
-        .ABUSWIDTH(32),
-        .IO_WIDTH(8),
-        .IO_DIRECTION(8'h00) // all 8 bits are considered as inputs
-    ) i_gpio2_rx (
-        .BUS_CLK(BUS_CLK),
-        .BUS_RST(BUS_RST),
-        .BUS_ADD(BUS_ADD),
-        .BUS_DATA(BUS_DATA[7:0]),
-        .BUS_RD(BUS_RD),
-        .BUS_WR(BUS_WR),
-        .IO(GPIO2)
-    );
-
-    // LEMO CONNECTORS
 
     /* -------  MODULE ADREESSES  ------- */
     localparam OUT0_BASEADDR = 32'h1040;
@@ -89,7 +43,7 @@ module bdaq_core_core(
         .ABUSWIDTH(32),
         .IO_WIDTH(8),
         .IO_DIRECTION(8'hff) // all 8 bits are considered as outputs
-    ) i_gpio_txi (
+    ) i_gpio_out0 (
         .BUS_CLK(BUS_CLK),
         .BUS_RST(BUS_RST),
         .BUS_ADD(BUS_ADD),
@@ -112,7 +66,7 @@ module bdaq_core_core(
         .ABUSWIDTH(32),
         .IO_WIDTH(8),
         .IO_DIRECTION(8'h00) // all 8 bits are considered as input
-    ) i_gpio_rxi (
+    ) i_gpio_in0 (
         .BUS_CLK(BUS_CLK),
         .BUS_RST(BUS_RST),
         .BUS_ADD(BUS_ADD),
@@ -122,6 +76,46 @@ module bdaq_core_core(
         .IO(IN0)
     );
 
+
+    localparam OUT1_BASEADDR = 32'h1080;
+    localparam OUT1_HIGHADDR = 32'h109f;
+
+    gpio #(
+        .BASEADDR(OUT1_BASEADDR),
+        .HIGHADDR(OUT1_HIGHADDR),
+        .ABUSWIDTH(32),
+        .IO_WIDTH(32),
+        .IO_DIRECTION(32'hffffffff) // all 32 bits outputs
+    ) i_gpio_out1 (
+        .BUS_CLK(BUS_CLK),
+        .BUS_RST(BUS_RST),
+        .BUS_ADD(BUS_ADD),
+        .BUS_DATA(BUS_DATA[7:0]),
+        .BUS_RD(BUS_RD),
+        .BUS_WR(BUS_WR),
+        .IO(OUT1)
+    );
+
+    localparam IN1_BASEADDR = 32'h10a0;
+    localparam IN1_HIGHADDR = 32'h10cf;
+
+    gpio #(
+        .BASEADDR(OUT1_BASEADDR),
+        .HIGHADDR(OUT1_HIGHADDR),
+        .ABUSWIDTH(32),
+        .IO_WIDTH(32),
+        .IO_DIRECTION(32'hffffffff) // all 32 bits outputs
+    ) i_gpio_in1 (
+        .BUS_CLK(BUS_CLK),
+        .BUS_RST(BUS_RST),
+        .BUS_ADD(BUS_ADD),
+        .BUS_DATA(BUS_DATA[7:0]),
+        .BUS_RD(BUS_RD),
+        .BUS_WR(BUS_WR),
+        .IO(IN1)
+    );
+
+    
    
     wire EN;
     assign EN = GPIO1[0];

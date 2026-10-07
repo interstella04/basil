@@ -15,18 +15,6 @@ transfer_layer:
         tcp_connection : True
 
 hw_drivers:
-  - name      : GPIO1
-    type      : gpio
-    interface : intf
-    base_addr : 0x1000
-    size      : 8
-
-  - name      : GPIO2
-    type      : gpio
-    interface : intf
-    base_addr : 0x1020
-    size      : 8
-
   - name      : OUT0
     type      : gpio
     interface : intf
@@ -46,30 +34,12 @@ hw_drivers:
     base_data_addr : 0x100000000
 
 registers:
-  - name        : GPIO1
-    type        : StdRegister
-    hw_driver   : GPIO1
-    size        : 8
-    fields:
-      - name    : LED
-        size    : 8
-        offset  : 7
-
-  - name        : GPIO2
-    type        : StdRegister
-    hw_driver   : GPIO2
-    size        : 8
-    fields:
-      - name    : LOOP_BACK
-        size    : 8
-        offset  : 7
-
   - name        : OUT0
     type        : StdRegister
     hw_driver   : OUT0
     size        : 8
     fields:
-      - name    : TXI
+      - name    : TX
         size    : 2
         offset  : 1
       - name    : GPIO_OUT
@@ -81,7 +51,7 @@ registers:
     hw_driver   : IN0
     size        : 8
     fields:
-      - name    : RXI
+      - name    : RX
         size    : 2
         offset  : 1
       - name    : GPIO_IN
