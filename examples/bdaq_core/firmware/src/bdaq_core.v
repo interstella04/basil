@@ -31,9 +31,8 @@ module bdaq_core_throughput_test(
         output wire [7:0] LED,
         output wire [1:0] TX,
         input wire [1:0] RX,
-        input wire [1:0] GPIO_IN,
-        output wire [1:0] GPIO_OUT,
-        inout wire [21:0] CMOS
+        inout wire [3:0] GPIO
+        // inout wire [21:0] CMOS
 
     );
 
@@ -275,6 +274,8 @@ module bdaq_core_throughput_test(
         .DATA_OUT(TCP_TX_DATA)
     );
 
+    wire [7:0] GPIO1;
+
     wire [7:0] OUT0;
     wire [7:0] IN0;
 
@@ -298,6 +299,8 @@ module bdaq_core_throughput_test(
         .FIFO_DATA(FIFO_DATA),
         .FIFO_VALID(fifo_write),
 
+        .GPIO1(GPIO1),
+
         .OUT0(OUT0),
         .IN0(IN0),
         .OUT1(OUT1),
@@ -307,7 +310,7 @@ module bdaq_core_throughput_test(
     //assign LED = ~{ TCP_OPEN_ACK, TCP_CLOSE_REQ, TCP_RX_WR, TCP_TX_WR,
     //        fifo_full, fifo_empty, fifo_write, TCP_TX_WR};    
             
-    // assign LED[7:0] = ~GPIO1[7:0];  
+    assign LED[7:0] = ~GPIO1[7:0];  
     // assign GPIO2[7:0] = GPIO1[7:0];
 
     // Lemo Connector
@@ -317,12 +320,17 @@ module bdaq_core_throughput_test(
 
     // GPIO Connector
 
-    assign GPIO_OUT[1:0] = OUT0[3:2];
-    assign IN0[3:2] = GPIO_IN[1:0];
+    // assign GPIO_OUT[1:0] = OUT0[3:2];
+    // assign IN0[3:2] = GPIO_IN[1:0];
+
+    assign GPIO[1] = OUT0[2];
+    assign GPIO[3] = OUT0[3];
+    assign IN0[2]  = GPIO[0]; // LOOP GPIO0/GPIO2
+    assign IN0[3]  = GPIO[2]; // LOOP GPIO1/GPIO3
 
     // CMOS LOOP
-    assign CMOS[10:0] = OUT1[10:0];
-    assign IN1[10:0] = CMOS[21:11];
+    // assign CMOS[10:0] = OUT1[10:0];
+    // assign IN1[10:0] = CMOS[21:11];
 
     // LVDS LOOP
 
@@ -333,6 +341,7 @@ module bdaq_core_throughput_test(
 
 
     /* -------  Main FSM  ------- */
+    
     always @(posedge BUS_CLK)
     begin
         // wait for start condition
@@ -361,6 +370,7 @@ module bdaq_core_throughput_test(
             ETH_START_SENDING_LOCK <= 0;
         end
     end
+    
 
 
 endmodule

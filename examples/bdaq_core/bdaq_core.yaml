@@ -21,10 +21,22 @@ hw_drivers:
     base_addr : 0x1040
     size      : 8
 
+  - name      : OUT1
+    type      : gpio
+    interface : intf
+    base_addr : 0x1080
+    size      : 8
+
   - name      : IN0
     type      : gpio
     interface : intf
     base_addr : 0x1060
+    size      : 8
+
+  - name      : IN1
+    type      : gpio
+    interface : intf
+    base_addr : 0x10a0
     size      : 8
 
   - name      : FIFO
@@ -39,22 +51,51 @@ registers:
     hw_driver   : OUT0
     size        : 8
     fields:
-      - name    : TX
-        size    : 2
+      - name    : TX0
+        size    : 1
+        offset  : 0
+      - name    : TX1
+        size    : 1
         offset  : 1
-      - name    : GPIO_OUT
-        size    : 2
+      - name    : GPIO1
+        size    : 1
+        offset  : 2
+      - name    : GPIO3
+        size    : 1
         offset  : 3
+
+  - name        : OUT1
+    type        : StdRegister
+    hw_driver   : OUT1
+    size        : 32
+    fields:
+      - name    : CMOS
+        size    : 11
+        offset  : 10
 
   - name        : IN0
     type        : StdRegister
     hw_driver   : IN0
     size        : 8
     fields:
-      - name    : RX
-        size    : 2
+      - name    : RX0
+        size    : 1
+        offset  : 0
+      - name    : RX1
+        size    : 1
         offset  : 1
-      - name    : GPIO_IN
-        size    : 2
+      - name    : GPIO0
+        size    : 1
+        offset  : 2
+      - name    : GPIO2
+        size    : 1
         offset  : 3
 
+  - name        : IN1
+    type        : StdRegister
+    hw_driver   : IN1
+    size        : 32
+    fields:
+      - name    : CMOS
+        size    : 11
+        offset  : 10

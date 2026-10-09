@@ -23,12 +23,36 @@ module bdaq_core_core(
         output reg          FIFO_VALID,
         output reg [31:0]   FIFO_DATA,
 
+        input wire [7:0] GPIO1,
+
         output wire [7:0] OUT0,
         input wire [7:0] IN0,
 
         output wire [31:0] OUT1,
-        input wire [31:0] IN1,
+        input wire [31:0] IN1
 
+    );
+
+        /* -------  MODULE ADREESSES  ------- */
+    localparam BASEADDR = 32'h1020;
+    localparam HIGHADDR = 32'h103f;
+
+
+    /* -------  USER MODULES  ------- */
+    gpio #(
+        .BASEADDR(BASEADDR),
+        .HIGHADDR(HIGHADDR),
+        .ABUSWIDTH(32),
+        .IO_WIDTH(8),
+        .IO_DIRECTION(8'h00) // all 8 bits are considered as outputs
+    ) i_gpio1 (
+        .BUS_CLK(BUS_CLK),
+        .BUS_RST(BUS_RST),
+        .BUS_ADD(BUS_ADD),
+        .BUS_DATA(BUS_DATA[7:0]),
+        .BUS_RD(BUS_RD),
+        .BUS_WR(BUS_WR),
+        .IO(GPIO1)
     );
 
     /* -------  MODULE ADREESSES  ------- */

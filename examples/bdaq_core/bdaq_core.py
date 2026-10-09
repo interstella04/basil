@@ -15,6 +15,7 @@ from basil.dut import Dut
 import yaml
 
 from colorama import Fore, Back, Style
+import re
 
 class LoopBackTest():
 
@@ -41,13 +42,13 @@ class LoopBackTest():
 
         return readout
 
-    def compare(self, value: int, readout: int, field_in: str, field_out: str, size: int):
+    def compare(self, value: int, readout: int, field_out: str, field_in: str, size: int):
         for i in range(size):
             try:
                 assert self.check_nth_bit(value,i) == self.check_nth_bit(readout, i)
             except AssertionError:
                 print(Fore.GREEN)
-                print(f"ERROR in bit {i} for IN = {self.check_nth_bit(value,i)}. Loop: (IN/OUT) {field_in}/{field_out}.")
+                print(f"ERROR for IN = {self.check_nth_bit(value,i)}. Loop: (OUT/IN) {field_out}/{field_in}.")
                 print(Style.RESET_ALL)
                 
     def registers(self):
@@ -77,7 +78,7 @@ class BDAQCoreTest(LoopBackTest):
         with open("bdaq_core.yaml", "r") as f:
             dict = yaml.safe_load(f)
         
-        self.mapping = dict["registers"]
+        self.conf = dict["registers"]
         
         super().__init__(self.chip)
 
@@ -87,11 +88,40 @@ class BDAQCoreTest(LoopBackTest):
         return range(2**size)
 
     def registers(self):
-        return [
-            # (OUT_reg, OUT_field, IN_reg, IN_field)
-            ("OUT0", "TX", "IN0", "RX", self.parameters(2), 2),
-            ("OUT0", "GPIO_OUT", "IN0", "GPIO_IN", self.parameters(2), 2),
-        ]
+        """ Returns list with entries like
+        (out_name, field_out, in_name, field_in, parameters, size)
+        """
+        regs = {r["name"]: r for r in self.conf} # 
+        cases = []
+
+        for name, out_reg in regs.items():
+            m = re.fullmatch(r"OUT(\d+)", name) # See if name matches OUTn pattern if not, m is None and loop continues 
+            if not m:
+                continue
+
+            in_name = f"IN{m.group(1)}" # returns \d from match
+            if in_name not in regs:
+                raise KeyError(f"{name} has no matching {in_name} in the YAML")
+            in_reg = regs[in_name]
+
+            out_fields = sorted(out_reg["fields"], key=lambda f: f["offset"])
+            in_fields = sorted(in_reg["fields"], key=lambda f: f["offset"]) # Sorts fields by offset, to avoid the matching of the GPIO slots being dependant of the order in which they are in the yaml
+            assert len(out_fields) == len(in_fields), \
+                f"{name} and {in_name} have a different number of fields"
+                # test if same number of fields are in IN and OUT, if not then something is missing
+
+            for fo, fi in zip(out_fields, in_fields):
+                assert fo["size"] == fi["size"], \
+                    f"size mismatch: {name}.{fo['name']} vs {in_name}.{fi['name']}"
+                    # Fields must have same size, otherwise something was typed in wrongly
+                cases.append((
+                    name, fo["name"],
+                    in_name, fi["name"],
+                    self.parameters(fo["size"]),
+                    fo["size"],
+                ))
+
+        return cases
 
 bdaq = BDAQCoreTest()
 bdaq.loop()
