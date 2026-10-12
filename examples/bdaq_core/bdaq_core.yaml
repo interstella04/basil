@@ -51,17 +51,11 @@ registers:
     hw_driver   : OUT0
     size        : 8
     fields:
-      - name    : TX0
-        size    : 1
-        offset  : 0
-      - name    : TX1
-        size    : 1
+      - name    : TX
+        size    : 2
         offset  : 1
-      - name    : GPIO1
-        size    : 1
-        offset  : 2
-      - name    : GPIO3
-        size    : 1
+      - name    : GPIO # GPIO1 and GPIO3
+        size    : 2
         offset  : 3
 
   - name        : OUT1
@@ -69,26 +63,23 @@ registers:
     hw_driver   : OUT1
     size        : 32
     fields:
-      - name    : CMOS
+      - name    : CMOS # CMOS0 -CMOS10
         size    : 11
         offset  : 10
+      - name    : LVDS_PN # LVDS_PN14 - LVDS_PN18
+        size    : 5
+        offset  : 11
 
   - name        : IN0
     type        : StdRegister
     hw_driver   : IN0
     size        : 8
     fields:
-      - name    : RX0
-        size    : 1
-        offset  : 0
-      - name    : RX1
-        size    : 1
+      - name    : RX
+        size    : 2
         offset  : 1
-      - name    : GPIO0
-        size    : 1
-        offset  : 2
-      - name    : GPIO2
-        size    : 1
+      - name    : GPIO # GPIO0 and GPIO2
+        size    : 2
         offset  : 3
 
   - name        : IN1
@@ -96,6 +87,9 @@ registers:
     hw_driver   : IN1
     size        : 32
     fields:
-      - name    : CMOS
+      - name    : CMOS # CMOS11 -CMOS21
         size    : 11
         offset  : 10
+      - name    : LVDS_PN # LVDS_PN19 - LVDS_PN23
+        size    : 5
+        offset  : 11

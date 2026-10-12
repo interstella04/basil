@@ -333,7 +333,7 @@ module bdaq_core_throughput_test(
     // LVDS LOOP
     wire [4:0] LVDS_OUT;
     assign LVDS_OUT = OUT1[15:11];
-    wire [4:0] LVDS_IN;   // straight out of the receivers without inverting it yet
+    wire [4:0] LVDS_IN;
 
     genvar i;
     generate

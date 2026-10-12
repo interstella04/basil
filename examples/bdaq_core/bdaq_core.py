@@ -17,6 +17,20 @@ import yaml
 from colorama import Fore, Back, Style
 import re
 
+from dataclasses import dataclass, field
+
+@dataclass(frozen=True)
+class LoopCase:
+    out_reg: str
+    out_field: str
+    in_reg: str
+    in_field: str
+    size: int
+    values: list
+    # offset: int = 0
+    bit_names_out: dict = field(default_factory=dict)
+    bit_names_in: dict = field(default_factory=dict)
+
 class LoopBackTest():
 
     def __init__(self, chip):
@@ -42,14 +56,15 @@ class LoopBackTest():
 
         return readout
 
-    def compare(self, value: int, readout: int, field_out: str, field_in: str, size: int):
-        for i in range(size):
-            try:
-                assert self.check_nth_bit(value,i) == self.check_nth_bit(readout, i)
-            except AssertionError:
-                print(Fore.GREEN)
-                print(f"ERROR for IN = {self.check_nth_bit(value,i)}. Loop: (OUT/IN) {field_out}/{field_in}.")
-                print(Style.RESET_ALL)
+    def compare(self, case: LoopCase, value: int, readout: int):
+        for i in range(case.size):
+            if self.check_nth_bit(value, i) != self.check_nth_bit(readout, i):
+                self.errormessage(case, value, i)
+
+    def errormessage(self, case: LoopCase, value: int, bit: int):
+        """ Prints Error Message for each kind of test. With correct mapping on where the error happened.
+        """
+        raise NotImplementedError
                 
     def registers(self):
         """Return an iterable of test cases.
@@ -58,12 +73,12 @@ class LoopBackTest():
         raise NotImplementedError
 
     def loop(self):
-        for write_reg, write_field, read_reg, read_field, values, size in self.registers():
-            for value in values:
-                self.write(write_reg, write_field, value)
-                readout = self.read(read_reg, read_field)
-                self.compare(value, readout, write_field, read_field, size)
-
+        for case in self.registers():
+            for value in case.values:
+                self.write(case.out_reg, case.out_field, value)
+                readout = self.read(case.in_reg, case.in_field)
+                self.compare(case, value, readout)
+    
         print("Check complete!")
 
     def check_nth_bit(self, num: int, n: int):
@@ -86,11 +101,32 @@ class BDAQCoreTest(LoopBackTest):
         """ Returns test range for given register size
         """
         return range(2**size)
+        
+    def errormessage(self, case: LoopCase, value: int, bit: int):
+        out_label = case.bit_names_out.get(bit, f"{case.out_field}[{bit}]")
+        in_label = case.bit_names_in.get(bit, f"{case.in_field}[{bit}]")
+        expected = (value >> bit) & 1
+        print(Fore.GREEN)
+        print(f"ERROR: {out_label} -> {in_label}: "
+              f"wrote {expected} ({'HIGH' if expected else 'LOW'}), read {1 - expected}")
+        print(Style.RESET_ALL)
+
+    def bit_names(self, reg, fld, size):
+        """ Small helper function to make registers() more readable
+        """
+        names = self.wiring.get(f"{reg}.{fld}", [])
+        if names and len(names) != size:
+            raise ValueError(f"{reg}.{fld}: {len(names)} names for a {size}-bit field")
+        return dict(enumerate(names))
 
     def registers(self):
         """ Returns list with entries like
         (out_name, field_out, in_name, field_in, parameters, size)
         """
+
+        with open("board_connections.yaml") as f:
+            self.wiring = yaml.safe_load(f)
+
         regs = {r["name"]: r for r in self.conf} # 
         cases = []
 
@@ -114,13 +150,14 @@ class BDAQCoreTest(LoopBackTest):
                 assert fo["size"] == fi["size"], \
                     f"size mismatch: {name}.{fo['name']} vs {in_name}.{fi['name']}"
                     # Fields must have same size, otherwise something was typed in wrongly
-                cases.append((
-                    name, fo["name"],
-                    in_name, fi["name"],
-                    self.parameters(fo["size"]),
-                    fo["size"],
+                
+                cases.append(LoopCase(
+                    out_reg=name, out_field=fo["name"],
+                    in_reg=in_name, in_field=fi["name"],
+                    size=fo["size"], values=self.parameters(fo["size"]),
+                    bit_names_out=self.bit_names(name, fo["name"], fo["size"]),
+                    bit_names_in=self.bit_names(in_name, fi["name"], fi["size"]),
                 ))
-
         return cases
 
 bdaq = BDAQCoreTest()

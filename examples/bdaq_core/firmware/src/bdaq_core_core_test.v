@@ -139,6 +139,9 @@ module bdaq_core_core(
         .IO(IN1)
     );
 
+
+    
+
     wire EN;
     assign EN = GPIO1[0];
 
