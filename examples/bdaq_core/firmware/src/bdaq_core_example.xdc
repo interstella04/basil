@@ -85,27 +85,24 @@ set_property PACKAGE_PIN C22 [get_ports {LED[7]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {LED[7]}]
 set_property SLEW SLOW [get_ports LED*]
 
-# SPI configuration flash
-set_property CONFIG_MODE SPIx4 [current_design]
-set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
-set_property BITSTREAM.CONFIG.CONFIGRATE 33 [current_design]
-
-# LEMO Connectors
+# LEMO Connectors TODO: CHANGE PINS
 # Receive
-set_property PACKAGE_PIN AC21 [get_ports {RX[0]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {RX[0]}]
+set_property PACKAGE_PIN AC21 [get_ports {LEMO_RX[0]}]
+set_property IOSTANDARD LVCMOS25 [get_ports {LEMO_RX[0]}]
 
-set_property PACKAGE_PIN AE25 [get_ports {RX[1]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {RX[1]}]
+set_property PACKAGE_PIN AE25 [get_ports {LEMO_RX[1]}]
+set_property IOSTANDARD LVCMOS25 [get_ports {LEMO_RX[1]}]
 
 # Transmit
-set_property PACKAGE_PIN AB21 [get_ports {TX[0]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {TX[0]}]
+set_property PACKAGE_PIN AB21 [get_ports {LEMO_TX[0]}]
+set_property IOSTANDARD LVCMO25 [get_ports {LEMO_TX[0]}]
 
-set_property PACKAGE_PIN AD25 [get_ports {TX[1]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {TX[1]}]
+set_property PACKAGE_PIN AD25 [get_ports {LEWMO_TX[1]}]
+set_property IOSTANDARD LVCMOS25 [get_ports {LEMO_TX[1]}]
 
-# GPIO Connector
+
+
+# GPIO Connector TODO: CHANGE PINS
 # GPIO0
 set_property PACKAGE_PIN W25 [get_ports {GPIO[0]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {GPIO[0]}]
@@ -118,6 +115,65 @@ set_property IOSTANDARD LVCMOS33 [get_ports {GPIO[2]}]
 # GPIO3
 set_property PACKAGE_PIN V26 [get_ports {GPIO[3]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {GPIO[3]}]
+
+# ------ Si570 / TLU RX CLK (TLU P / N inverted w.r.t Si570)
+set_property PACKAGE_PIN H6 [get_ports MGT_REFCLK0_P]
+set_property PACKAGE_PIN H5 [get_ports MGT_REFCLK0_N]
+
+# ------ SMA CLK
+set_property PACKAGE_PIN K6 [get_ports MGT_REFCLK1_P]
+set_property PACKAGE_PIN K5 [get_ports MGT_REFCLK1_N]
+
+# ------ Si511 (P / N inverted w.r.t. IC output)
+set_property PACKAGE_PIN F6 [get_ports MGT_REFCLK3_P]
+set_property PACKAGE_PIN F5 [get_ports MGT_REFCLK3_N]
+
+# ------ CLK MUX
+set_property PACKAGE_PIN AC24 [get_ports CLK_SEL]
+set_property IOSTANDARD LVCMOS25 [get_ports CLK_SEL]
+set_property PULLUP true [get_ports CLK_SEL]
+
+# ------ FCLK (100 MHz)
+set_property PACKAGE_PIN AA4 [get_ports FCLK_IN]
+set_property IOSTANDARD LVCMOS15 [get_ports FCLK_IN]
+
+# ------ Button & Spare & more
+set_property PACKAGE_PIN AC23 [get_ports SW_RESET_B]
+set_property IOSTANDARD LVCMOS25 [get_ports SW_RESET_B]
+set_property PULLUP true [get_ports SW_RESET_B]
+
+# User push button
+set_property PACKAGE_PIN AC21 [get_ports SW_USER_B]
+set_property IOSTANDARD LVCMOS25 [get_ports SW_USER_B]
+set_property PULLUP true [get_ports SW_USER_B]
+
+# I2C
+set_property PACKAGE_PIN L23 [get_ports I2C_SCL]
+set_property PACKAGE_PIN C24 [get_ports I2C_SDA]
+set_property IOSTANDARD LVCMOS25 [get_ports I2C_*]
+set_property SLEW SLOW [get_ports I2C_*]
+
+# EEPROM (SPI for SiTCP)
+set_property PACKAGE_PIN AF22 [get_ports EEPROM_CLK]
+set_property PACKAGE_PIN AE22 [get_ports EEPROM_SK]
+set_property PACKAGE_PIN AE21 [get_ports EEPROM_DI]
+set_property PACKAGE_PIN AD21 [get_ports EEPROM_DO]
+set_property IOSTANDARD LVCMOS25 [get_ports EEPROM_*]
+
+# DP ("DP0" on base board) connected to SelectIOs
+set_property PACKAGE_PIN C16 [get_ports {LANE_P[0]}]
+set_property PACKAGE_PIN B16 [get_ports {LANE_N[0]}]
+set_property PACKAGE_PIN B17 [get_ports {LANE_P[1]}]
+set_property PACKAGE_PIN A17 [get_ports {LANE_N[1]}]
+set_property PACKAGE_PIN E18 [get_ports {LANE_P[2]}]
+set_property PACKAGE_PIN D18 [get_ports {LANE_N[2]}]
+set_property PACKAGE_PIN C19 [get_ports {LANE_P[3]}]
+set_property PACKAGE_PIN B19 [get_ports {LANE_N[3]}]
+set_property PACKAGE_PIN A18 [get_ports {AUX_P}]
+set_property PACKAGE_PIN A19 [get_ports {AUX_N}]
+
+set_property IOSTANDARD LVDS_25 [get_ports LANE_*]
+set_property IOSTANDARD LVDS_25 [get_ports AUX_*]
 
 # LVDS
 # LVDS_P[23:0] / LVDS_N[23:0]
@@ -216,6 +272,48 @@ set_property PACKAGE_PIN AC22 [get_ports {NTC_MUX[1]}]
 set_property PACKAGE_PIN AB22 [get_ports {NTC_MUX[2]}]
 set_property IOSTANDARD LVCMOS25 [get_ports {NTC_MUX*}]
 set_property SLEW SLOW [get_ports NTC*]
+
+# RJ45 1-4
+set_property PACKAGE_PIN D23 [get_ports {RJ45_P[0]}]
+set_property PACKAGE_PIN D24 [get_ports {RJ45_N[0]}]
+set_property PACKAGE_PIN E21 [get_ports {RJ45_P[1]}]
+set_property PACKAGE_PIN E22 [get_ports {RJ45_N[1]}]
+set_property PACKAGE_PIN D21 [get_ports {RJ45_P[2]}]
+set_property PACKAGE_PIN C22 [get_ports {RJ45_N[2]}]
+set_property PACKAGE_PIN F22 [get_ports {RJ45_P[3]}]
+set_property PACKAGE_PIN E23 [get_ports {RJ45_N[3]}]
+
+# TODO: Correct?
+set_property IOSTANDARD LVDS_25 [get_ports RJ45_*]
+
+# TLU
+# TLU RX CLK to MGT_REFCLK_0 (P / N inverted!) via CLK_SEL = 1
+set_property PACKAGE_PIN C21 [get_ports {TLU_RESET_P}]
+set_property PACKAGE_PIN B21 [get_ports {TLU_RESET_N}]
+set_property PACKAGE_PIN A23 [get_ports {TLU_BUSY_P}]
+set_property PACKAGE_PIN A24 [get_ports {TLU_BUSY_N}]
+set_property PACKAGE_PIN B20 [get_ports {TLU_TRIG_P}]
+set_property PACKAGE_PIN A20 [get_ports {TLU_TRIG_N}]
+set_property PACKAGE_PIN D26 [get_ports {TLU_CLK_TX_P}]
+set_property PACKAGE_PIN C26 [get_ports {TLU_CLK_TX_N}]
+set_property PACKAGE_PIN B15 [get_ports {TLU_CONT}]
+set_property PACKAGE_PIN A15 [get_ports {TLU_CONT}]
+
+set_property PACKAGE_PIN V21 [get_ports {TLU_SE[0]}]
+set_property PACKAGE_PIN W21 [get_ports {TLU_SE[1]}]
+set_property PACKAGE_PIN V23 [get_ports {TLU_SE[2]}]
+
+set_property IOSTANDARD LVDS_25 [get_ports TLU_RESET_*]
+set_property IOSTANDARD LVDS_25 [get_ports TLU_BUSY_*]
+set_property IOSTANDARD LVDS_25 [get_ports TLU_CONT_*]
+set_property IOSTANDARD LVDS_25 [get_ports TLU_TRIG_*]
+set_property IOSTANDARD LVDS_25 [get_ports TLU_CLK_TX_*]
+set_property IOSTANDARD LVCMOS25 [get_ports TLU_SE*]
+
+# TODO WHAT IOSTANDARD? AND VDD or VDDD?
+set_property PACKAGE_PIN AB26 [get_ports {RST0}]
+set_property PACKAGE_PIN AC26 [get_ports {VDD_SNS_B}]
+
 
 # SPI configuration flash
 set_property CONFIG_MODE SPIx4 [current_design]

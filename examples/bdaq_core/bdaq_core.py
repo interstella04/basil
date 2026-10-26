@@ -27,7 +27,6 @@ class LoopCase:
     in_field: str
     size: int
     values: list
-    # offset: int = 0
     bit_names_out: dict = field(default_factory=dict)
     bit_names_in: dict = field(default_factory=dict)
 
@@ -103,9 +102,11 @@ class BDAQCoreTest(LoopBackTest):
         return range(2**size)
         
     def errormessage(self, case: LoopCase, value: int, bit: int):
+        """ Constructs Error message. 
+        """
         out_label = case.bit_names_out.get(bit, f"{case.out_field}[{bit}]")
         in_label = case.bit_names_in.get(bit, f"{case.in_field}[{bit}]")
-        expected = (value >> bit) & 1
+        expected = self.check_nth_bit(value, bit)
         print(Fore.GREEN)
         print(f"ERROR: {out_label} -> {in_label}: "
               f"wrote {expected} ({'HIGH' if expected else 'LOW'}), read {1 - expected}")

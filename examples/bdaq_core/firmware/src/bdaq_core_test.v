@@ -29,13 +29,32 @@ module bdaq_core_throughput_test(
         output wire phy_rst_n,
 
         output wire [7:0] LED,
-        output wire [1:0] TX,
-        input wire [1:0] RX,
+        output wire [1:0] LEMO_TX,
+        input wire [1:0] LEMO_RX,
         inout wire [3:0] GPIO,
         inout wire [21:0] CMOS,
         inout wire [23:0] LVDS_P,
-        inout wire [23:0] LVDS_N
-
+        inout wire [23:0] LVDS_N,
+        input wire [4:0] Lane_P,
+        input wire [4:0] Lane_N,
+        input wire AUX_N,
+        input wire AUX_P,
+        input wire [3:0] RJ45_N,
+        input wire [3:0] RJ45_P,
+        inout wire [7:0] LVCMOS,
+        input wire RST0,
+        input wire VDD_SNS_B,
+        input wire TLU_CLK_TX_N, // TODO: won't work. Splits up to TLU_CLK_RX/TX_P/N
+        input wire TLU_CLK_TX_P, // but TLU_CLK_RX_P/N doesn't go to FPGA
+        input wire TLU_CONT_N,
+        input wire TLU_CONT_P,
+        input wire TLU_BUSY_N,
+        input wire TLU_BUSY_P,
+        input wire TLU_RESET_N,
+        input wire TLU_RESET_P,
+        input wire TLU_TRIG_N,
+        input wire TLU_TRIG_P,
+        input wire [2:0] TLU_SE
     );
 
     wire RST;
@@ -87,7 +106,6 @@ module bdaq_core_throughput_test(
         .RST(!RESET_N),
         .CLKFBIN(PLL_FEEDBACK)
     );
-
 
     wire BUS_CLK;
     BUFG BUFG_inst_BUS_CKL    (.O(BUS_CLK),     .I(BUS_CLK_PLL)   );
@@ -284,6 +302,9 @@ module bdaq_core_throughput_test(
     wire [31:0] OUT1;
     wire [31:0] IN1;
 
+    wire [31:0] OUT2;
+    wire [31:0] IN2;
+
     bdaq_core_core i_bdaq_core_core(
         .RESET_N(RESET_N),
 
@@ -306,7 +327,9 @@ module bdaq_core_throughput_test(
         .OUT0(OUT0),
         .IN0(IN0),
         .OUT1(OUT1),
-        .IN1(IN1)
+        .IN1(IN1),
+        .OUT2(OUT2),
+        .IN2(IN2)
     );
 
     //assign LED = ~{ TCP_OPEN_ACK, TCP_CLOSE_REQ, TCP_RX_WR, TCP_TX_WR,
@@ -316,8 +339,8 @@ module bdaq_core_throughput_test(
 
     // Lemo Connector
 
-    assign TX[1:0] = OUT0[1:0];
-    assign IN0[1:0] = RX[1:0];
+    assign LEMO_TX[1:0] = OUT0[1:0];
+    assign IN0[1:0] = LEMO_RX[1:0];
 
     // GPIO Connector
 
@@ -330,7 +353,7 @@ module bdaq_core_throughput_test(
     assign CMOS[10:0] = OUT1[10:0];
     assign IN1[10:0] = {CMOS[11], CMOS[12], CMOS[13], CMOS[14], CMOS[15], CMOS[16], CMOS[17], CMOS[18], CMOS[19], CMOS[20], CMOS[21]};
 
-    // LVDS LOOP
+    // LVDS 14 -23 LOOP
     wire [4:0] LVDS_OUT;
     assign LVDS_OUT = OUT1[15:11];
     wire [4:0] LVDS_IN;
@@ -362,6 +385,142 @@ module bdaq_core_throughput_test(
     // Undo the P/N crossover of the cable/board so that bit i written comes back as bit i
     assign IN1[15:11] = ~LVDS_IN[4:0];
 
+
+    // LVDS LANE and AUX LOOP
+
+    wire [4:0] LVDS_LANE_OUT;
+    assign LVDS_LANE_OUT = OUT1[20:16];
+    wire [4:0] LVDS_LANE_IN;
+
+    genvar j;
+    generate
+        for (j = 0; j < 4; j = j + 1) begin : g_lvds_lane_loop
+            OBUFDS #(
+                .IOSTANDARD("LVDS_25")
+            ) i_obufds (
+                .O  (LVDS_P[9 + ((j + 3) % 4)]),
+                .OB (LVDS_N[9 + ((j + 3) % 4)]),
+                .I  (LVDS_LANE_OUT[j])
+            );
+
+            // Receive on lane j
+            IBUFDS #(
+                .IOSTANDARD("LVDS_25"),
+                .DIFF_TERM("TRUE")
+            ) i_ibufds (
+                .O  (LVDS_LANE_IN[j]),
+                .I  (LANE_P[j]),
+                .IB (LANE_N[j])
+            );
+        end
+    endgenerate
+
+    // Bit 4: pair LVDS_13 to AUX
+    OBUFDS #(
+        .IOSTANDARD("LVDS_25")
+    ) i_obufds_aux (
+        .O  (LVDS_P[13]),
+        .OB (LVDS_N[13]),
+        .I  (LVDS_LANE_OUT[4])
+    );
+
+    IBUFDS #(
+        .IOSTANDARD("LVDS_25"),
+        .DIFF_TERM("TRUE")
+    ) i_ibufds_aux (
+        .O  (LVDS_LANE_IN[4]),
+        .I  (AUX_P),
+        .IB (AUX_N)
+    );
+
+    assign IN1[20:16] = LVDS_LANE_IN[4:0];
+
+    // LVDS RJ45 LOOP
+
+    wire [4:0] LVDS_RJ45_OUT;
+    assign LVDS_RJ45_OUT = OUT1[25:21];
+    wire [4:0] LVDS_RJ45_IN;
+
+    genvar j;
+    generate
+        for (j = 0; j < 4; j = j + 1) begin : g_lvds_rj45_loop
+            OBUFDS #(
+                .IOSTANDARD("LVDS_25")
+            ) i_obufds (
+                .O  (LVDS_P[j]),
+                .OB (LVDS_N[j]),
+                .I  (LVDS_RJ45_OUT[j])
+            );
+
+            // Receive on RJ45_(j+1)
+            IBUFDS #(
+                .IOSTANDARD("LVDS_25"),
+                .DIFF_TERM("TRUE")
+            ) i_ibufds (
+                .O  (LVDS_RJ45_IN[j]),
+                .I  (RJ45_P[j]),
+                .IB (RJ45_N[j])
+            );
+        end
+    endgenerate
+
+    assign IN1[25:21] = LVDS_RJ45_IN;
+
+    // LVDS TLU LOOP
+
+    wire [4:0] TLU_N;
+    assign TLU_N = {TLU_CLK_TX_N, TLU_CONT_N, TLU_BUSY_N, TLU_RESET_N, TLU_TRIG_N};
+    wire [4:0] TLU_P;
+    assign TLU_P = {TLU_CLK_TX_P, TLU_CONT_P, TLU_BUSY_P, TLU_RESET_P, TLU_TRIG_P};
+
+    wire [4:0] LVDS_TLU_OUT;
+    assign LVDS_TLU_OUT = OUT1[31:26];
+    wire [4:0] LVDS_TLU_IN;
+
+    genvar j;
+    generate
+        for (j = 0; j < 5; j = j + 1) begin : g_lvds_tlu_loop
+            OBUFDS #(
+                .IOSTANDARD("LVDS_25")
+            ) i_obufds (
+                .O  (LVDS_P[8-j]),
+                .OB (LVDS_N[8-j]),
+                .I  (LVDS_TLU_OUT[j])
+            );
+
+            // Receive on TLU_%_CON_P/N
+            IBUFDS #(
+                .IOSTANDARD("LVDS_25"),
+                .DIFF_TERM("TRUE")
+            ) i_ibufds (
+                .O  (LVDS_TLU_IN[j]),
+                .I  (TLU_P[j]),
+                .IB (TLU_N[j])
+            );
+        end
+    endgenerate
+
+    assign IN1[31:26] = LVDS_TLU_IN;
+
+    // LVCMOS LOOPs
+
+    assign LVCMOS[0] = OUT2[0];
+    assign In2[0] = RST0;
+
+    assign LVCMOS[1] = OUT[1];
+    assign IN2[1] = VDD_SNS_B;
+
+    assign LVCMOS[2] = OUT[2];
+    assign IN2[2] = TLU_SE[2];
+
+    assign LVCMOS[3] = OUT[3];
+    assign IN2[3] = TLU_SE[1];
+
+    assign LVCMOS[4] = OUT[4];
+    assign IN2[4] = TLU_SE[0];
+
+    assign LVCMOS[5] = OUT[5];
+    assign IN2[5] = LVCMOS[6];
 
     /*-------------------------------------------------------------------------*/
 

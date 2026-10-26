@@ -27,6 +27,12 @@ hw_drivers:
     base_addr : 0x1080
     size      : 8
 
+  - name      : OUT2
+    type      : gpio
+    interface : intf
+    base_addr : 0x10d0
+    size      : 8
+
   - name      : IN0
     type      : gpio
     interface : intf
@@ -37,6 +43,12 @@ hw_drivers:
     type      : gpio
     interface : intf
     base_addr : 0x10a0
+    size      : 8
+
+  - name      : IN2
+    type      : gpio
+    interface : intf
+    base_addr : 0x1100
     size      : 8
 
   - name      : FIFO
@@ -68,7 +80,26 @@ registers:
         offset  : 10
       - name    : LVDS_PN # LVDS_PN14 - LVDS_PN18
         size    : 5
-        offset  : 11
+        offset  : 15
+      - name    : LVDS_LANE # LVDS_12, 9, 10, 11
+        size    : 5
+        offset  : 20
+      - name    : LVDS_RJ45 # LVDS 0-3 PN
+        size    : 4
+        offset  : 24
+      - name    : LVDS_TLU # LVDS 8-4 PN
+        size    : 5
+        offset  : 29
+
+  - name        : OUT2
+    type        : StdRegister
+    hw_driver   : OUT2
+    size        : 32
+    fields      :
+      - name    : LVCMOS # LVCMOS 0-5, 7
+        size    : 6
+        offset  : 5
+
 
   - name        : IN0
     type        : StdRegister
@@ -92,4 +123,22 @@ registers:
         offset  : 10
       - name    : LVDS_PN # LVDS_PN19 - LVDS_PN23
         size    : 5
-        offset  : 11
+        offset  : 15
+      - name    : LANE_AUX # LANE_PN0 - LANE_PN3 and AUX_PN
+        size    : 5
+        offset  : 20
+      - name    : LVDS_RJ45 # RJ45 1-4
+        size    : 4
+        offset  : 24
+      - name    : LVDS_TLU # TLUs (CLK, CONT, BUSY, RESET, TRIG) PN
+        size    : 5
+        offset  : 29
+
+  - name        : IN2
+    type        : StdRegister
+    hw_driver   : IN2
+    size        : 32
+    fields      :
+      - name    : LVCMOS # RST_B, VDDD_SENSE, TLU_SE_2-0, LVCMOS6
+        size    : 6
+        offset  : 5
