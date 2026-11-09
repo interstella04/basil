@@ -19,7 +19,9 @@ import re
 
 from dataclasses import dataclass, field
 
-@dataclass(frozen=True)
+from collections import Counter
+
+@dataclass#(frozen=True)
 class LoopCase:
     out_reg: str
     out_field: str
@@ -29,6 +31,7 @@ class LoopCase:
     values: list
     bit_names_out: dict = field(default_factory=dict)
     bit_names_in: dict = field(default_factory=dict)
+    errors: Counter = field(default_factory=Counter)
 
 class LoopBackTest():
 
@@ -71,13 +74,24 @@ class LoopBackTest():
         """
         raise NotImplementedError
 
+    def summary(self, case: LoopCase, bit: int):
+        """ Prints summary of Errors that occured during a test for a specific case.
+        """
+        raise NotImplementedError
+
     def loop(self):
-        for case in self.registers():
+        cases = self.registers()
+
+        for case in cases:
             for value in case.values:
                 self.write(case.out_reg, case.out_field, value)
                 readout = self.read(case.in_reg, case.in_field)
                 self.compare(case, value, readout)
-    
+
+        for case in cases:
+            print(f"-------------------{case.out_field} to {case.in_field}-------------------")
+            self.summary(case)
+
         print("Check complete!")
 
     def check_nth_bit(self, num: int, n: int):
@@ -102,15 +116,25 @@ class BDAQCoreTest(LoopBackTest):
         return range(2**size)
         
     def errormessage(self, case: LoopCase, value: int, bit: int):
-        """ Constructs Error message. 
+        """ Constructs Error message. And counts errors for one loop field
         """
         out_label = case.bit_names_out.get(bit, f"{case.out_field}[{bit}]")
         in_label = case.bit_names_in.get(bit, f"{case.in_field}[{bit}]")
         expected = self.check_nth_bit(value, bit)
-        print(Fore.GREEN)
-        print(f"ERROR: {out_label} -> {in_label}: "
-              f"wrote {expected} ({'HIGH' if expected else 'LOW'}), read {1 - expected}")
-        print(Style.RESET_ALL)
+        print(Fore.GREEN + f"ERROR: {out_label} -> {in_label}: "
+              f"wrote {expected} ({'HIGH' if expected else 'LOW'}), read {1 - expected}" + Style.RESET_ALL)
+
+        case.errors[bit] += 1
+        # If bit not existent in errors dict with Counter() objects, the Counter Class is not raising a KeyError but instead starting to count for this bit 
+
+    def summary(self, case: LoopCase):
+        for bit, count in sorted(case.errors.items()):
+            out_label = case.bit_names_out.get(bit, f"{case.out_field}[{bit}]")
+            in_label = case.bit_names_in.get(bit, f"{case.in_field}[{bit}]")
+            print(Fore.RED
+                  + f"ERROR summary: {out_label} -> {in_label}: "
+                  f"failed on {count} of {len(case.values)} values"
+                  + Style.RESET_ALL)
 
     def bit_names(self, reg, fld, size):
         """ Small helper function to make registers() more readable
