@@ -1,10 +1,10 @@
 # OUT0
 OUT0.TX:      ["TX0", "TX1"]
-OUT0.GPIO:    ["GPIO1", "GPIO3"]
+OUT0.PMOD:    ["GPIO1", "GPIO3"]
 
 #IN0
 IN0.RX:      ["RX0", "RX1"]
-IN0.GPIO:    ["GPIO0", "GPIO2"]
+IN0.PMOD:    ["GPIO0", "GPIO2"]
 
 # OUT1
 OUT1.CMOS:     ["CMOS0", "CMOS1", "CMOS2", "CMOS3", "CMOS4", "CMOS5", "CMOS6", "CMOS7", "CMOS8", "CMOS9", "CMOS10"]

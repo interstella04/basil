@@ -29,7 +29,10 @@ module bdaq_core_core(
         input wire [7:0] IN0,
 
         output wire [31:0] OUT1,
-        input wire [31:0] IN1
+        input wire [31:0] IN1,
+
+        output wire [31:0] OUT2,
+        input wire [31:0] IN2
 
     );
 
@@ -124,11 +127,11 @@ module bdaq_core_core(
     localparam IN1_HIGHADDR = 32'h10cf;
 
     gpio #(
-        .BASEADDR(OUT1_BASEADDR),
-        .HIGHADDR(OUT1_HIGHADDR),
+        .BASEADDR(IN1_BASEADDR),
+        .HIGHADDR(IN1_HIGHADDR),
         .ABUSWIDTH(32),
         .IO_WIDTH(32),
-        .IO_DIRECTION(32'hffffffff) // all 32 bits outputs
+        .IO_DIRECTION(32'h00000000) // all 32 bits inputs
     ) i_gpio_in1 (
         .BUS_CLK(BUS_CLK),
         .BUS_RST(BUS_RST),
@@ -139,8 +142,46 @@ module bdaq_core_core(
         .IO(IN1)
     );
 
+    localparam OUT2_BASEADDR = 32'h10d0;
+    localparam OUT2_HIGHADDR = 32'h10ff;
+
+    gpio #(
+        .BASEADDR(OUT2_BASEADDR),
+        .HIGHADDR(OUT2_HIGHADDR),
+        .ABUSWIDTH(32),
+        .IO_WIDTH(32),
+        .IO_DIRECTION(32'hffffffff) // all 32 bits outputs
+    ) i_gpio_out2 (
+        .BUS_CLK(BUS_CLK),
+        .BUS_RST(BUS_RST),
+        .BUS_ADD(BUS_ADD),
+        .BUS_DATA(BUS_DATA[7:0]),
+        .BUS_RD(BUS_RD),
+        .BUS_WR(BUS_WR),
+        .IO(OUT2)
+    );
+
+    localparam IN2_BASEADDR = 32'h1100;
+    localparam IN2_HIGHADDR = 32'h111f;
+
+    gpio #(
+        .BASEADDR(IN2_BASEADDR),
+        .HIGHADDR(IN2_HIGHADDR),
+        .ABUSWIDTH(32),
+        .IO_WIDTH(32),
+        .IO_DIRECTION(32'h00000000) // all 32 bits inputs
+    ) i_gpio_in2 (
+        .BUS_CLK(BUS_CLK),
+        .BUS_RST(BUS_RST),
+        .BUS_ADD(BUS_ADD),
+        .BUS_DATA(BUS_DATA[7:0]),
+        .BUS_RD(BUS_RD),
+        .BUS_WR(BUS_WR),
+        .IO(IN2)
+    );
+
     
-   
+
     wire EN;
     assign EN = GPIO1[0];
 

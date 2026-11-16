@@ -131,7 +131,12 @@ class BDAQCoreTest(LoopBackTest):
         for bit, count in sorted(case.errors.items()):
             out_label = case.bit_names_out.get(bit, f"{case.out_field}[{bit}]")
             in_label = case.bit_names_in.get(bit, f"{case.in_field}[{bit}]")
-            print(Fore.RED
+            if count == 0:
+                print(Fore.GREEN
+                  + f"Test PASSED: {out_label} -> {in_label}: "
+                  + Style.RESET_ALL)
+            else:
+                print(Fore.RED
                   + f"ERROR summary: {out_label} -> {in_label}: "
                   f"failed on {count} of {len(case.values)} values"
                   + Style.RESET_ALL)

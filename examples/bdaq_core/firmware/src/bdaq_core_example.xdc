@@ -85,36 +85,34 @@ set_property PACKAGE_PIN C22 [get_ports {LED[7]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {LED[7]}]
 set_property SLEW SLOW [get_ports LED*]
 
-# LEMO Connectors TODO: CHANGE PINS
-# Receive
-set_property PACKAGE_PIN AC21 [get_ports {LEMO_RX[0]}]
-set_property IOSTANDARD LVCMOS25 [get_ports {LEMO_RX[0]}]
-
-set_property PACKAGE_PIN AE25 [get_ports {LEMO_RX[1]}]
-set_property IOSTANDARD LVCMOS25 [get_ports {LEMO_RX[1]}]
-
-# Transmit
-set_property PACKAGE_PIN AB21 [get_ports {LEMO_TX[0]}]
-set_property IOSTANDARD LVCMO25 [get_ports {LEMO_TX[0]}]
-
-set_property PACKAGE_PIN AD25 [get_ports {LEWMO_TX[1]}]
-set_property IOSTANDARD LVCMOS25 [get_ports {LEMO_TX[1]}]
+# LEMO
+set_property PACKAGE_PIN G11 [get_ports LEMO_TX[0]]
+set_property PACKAGE_PIN F19 [get_ports LEMO_TX[1]]
+set_property IOSTANDARD LVCMOS25 [get_ports LEMO_TX*]
+set_property SLEW FAST [get_ports LEMO_TX*]
+set_property PACKAGE_PIN F10 [get_ports LEMO_RX[0]]
+set_property PACKAGE_PIN E20 [get_ports LEMO_RX[1]]
+set_property IOSTANDARD LVCMOS25 [get_ports LEMO_RX*]
 
 
+# PMOD
+# ! Different to BDAQ53 (naming and pullup)
+#  _______
+# |0 1 2 3|  First PMOD channel (4 signal lines)
+# |G_G_G_G|  Second PMOD channel (GND)
+#
+# PMOD connector Pin3-->PMOD3; Pin2-->PMOD2; Pin1-->PMOD1; Pin0-->PMOD0;
+set_property PACKAGE_PIN W25 [get_ports {PMOD[0]}]
+set_property PACKAGE_PIN W26 [get_ports {PMOD[1]}]
+set_property PACKAGE_PIN U26 [get_ports {PMOD[2]}]
+set_property PACKAGE_PIN V26 [get_ports {PMOD[3]}]
+set_property IOSTANDARD LVCMOS25 [get_ports PMOD*]
+# Pull up the PMOD pins which are used as inputs, other pins connected to GND on PCB
+set_property PULLUP true [get_ports {PMOD[3]}]
+set_property PULLUP true [get_ports {PMOD[2]}]
+set_property PULLUP true [get_ports {PMOD[1]}]
+set_property PULLUP true [get_ports {PMOD[0]}]
 
-# GPIO Connector TODO: CHANGE PINS
-# GPIO0
-set_property PACKAGE_PIN W25 [get_ports {GPIO[0]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {GPIO[0]}]
-# GPIO1
-set_property PACKAGE_PIN W26 [get_ports {GPIO[1]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {GPIO[1]}]
-# GPIO2
-set_property PACKAGE_PIN U26 [get_ports {GPIO[2]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {GPIO[2]}]
-# GPIO3
-set_property PACKAGE_PIN V26 [get_ports {GPIO[3]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {GPIO[3]}]
 
 # ------ Si570 / TLU RX CLK (TLU P / N inverted w.r.t Si570)
 set_property PACKAGE_PIN H6 [get_ports MGT_REFCLK0_P]

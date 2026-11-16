@@ -4,6 +4,7 @@ firmware/vivado/designs
 firmware/vivado/output
 firmware/vivado/reports
 firmware/SiTCP
+firmware/SiTCP10G
 
 *.log
 *.history

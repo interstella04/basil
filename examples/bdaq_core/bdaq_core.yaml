@@ -66,7 +66,7 @@ registers:
       - name    : TX
         size    : 2
         offset  : 1
-      - name    : GPIO # GPIO1 and GPIO3
+      - name    : PMOD # GPIO1 and GPIO3
         size    : 2
         offset  : 3
 
@@ -109,7 +109,7 @@ registers:
       - name    : RX
         size    : 2
         offset  : 1
-      - name    : GPIO # GPIO0 and GPIO2
+      - name    : PMOD # GPIO0 and GPIO2
         size    : 2
         offset  : 3
 
