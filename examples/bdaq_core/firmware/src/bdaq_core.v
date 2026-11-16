@@ -15,7 +15,6 @@
 
 
 module bdaq_core_throughput_test(
-        input wire RESET_N,
         input wire clkin,
 
         output wire [3:0] rgmii_txd,
@@ -35,8 +34,8 @@ module bdaq_core_throughput_test(
         inout wire [21:0] CMOS,
         inout wire [23:0] LVDS_P,
         inout wire [23:0] LVDS_N,
-        input wire [4:0] LANE_P,
-        input wire [4:0] LANE_N,
+        input wire [3:0] LANE_P,
+        input wire [3:0] LANE_N,
         input wire AUX_N,
         input wire AUX_P,
         input wire [3:0] RJ45_N,
@@ -102,8 +101,8 @@ module bdaq_core_throughput_test(
         .CLKFBOUT(PLL_FEEDBACK),
         .LOCKED(LOCKED),
         .CLKIN1(clkin),
-        .PWRDWN(0),
-        .RST(!RESET_N),
+        .PWRDWN(1'b0),
+        .RST(1'b0),            // changed: no reset pin any more
         .CLKFBIN(PLL_FEEDBACK)
     );
 
@@ -115,7 +114,7 @@ module bdaq_core_throughput_test(
     BUFG BUFG_inst_CLK125TX90 ( .O(CLK125TX90), .I(CLK125PLLTX90) );
     BUFG BUFG_inst_CLK125RX   ( .O(CLK125RX),   .I(rgmii_rxc)     );
 
-    assign RST = !RESET_N | !LOCKED;
+    assign RST = !LOCKED; // TODO: CHANGED STUFF HERE RST = !RESET_N | !LOCKED
 
 
     wire   gmii_tx_en;
@@ -306,7 +305,7 @@ module bdaq_core_throughput_test(
     wire [31:0] IN2;
 
     bdaq_core_core i_bdaq_core_core(
-        .RESET_N(RESET_N),
+        .RESET_N(1'b1),
 
         // clocks from PLL
         .BUS_CLK(BUS_CLK),
@@ -330,10 +329,7 @@ module bdaq_core_throughput_test(
         .IN1(IN1),
         .OUT2(OUT2),
         .IN2(IN2)
-    );
-
-    //assign LED = ~{ TCP_OPEN_ACK, TCP_CLOSE_REQ, TCP_RX_WR, TCP_TX_WR,
-    //        fifo_full, fifo_empty, fifo_write, TCP_TX_WR};    
+    );   
             
     assign LED[7:0] = ~GPIO1[7:0];  
 
@@ -437,9 +433,9 @@ module bdaq_core_throughput_test(
 
     // LVDS RJ45 LOOP
 
-    wire [4:0] LVDS_RJ45_OUT;
-    assign LVDS_RJ45_OUT = OUT1[25:21];
-    wire [4:0] LVDS_RJ45_IN;
+    wire [3:0] LVDS_RJ45_OUT;
+    assign LVDS_RJ45_OUT = OUT1[24:21];
+    wire [3:0] LVDS_RJ45_IN;
 
     genvar k;
     generate
@@ -464,17 +460,17 @@ module bdaq_core_throughput_test(
         end
     endgenerate
 
-    assign IN1[25:21] = LVDS_RJ45_IN;
+    assign IN1[24:21] = LVDS_RJ45_IN;
 
     // LVDS TLU LOOP
 
     wire [4:0] TLU_N;
-    assign TLU_N = {TLU_CLK_TX_N, TLU_CONT_N, TLU_BUSY_N, TLU_RESET_N, TLU_TRIG_N};
+    assign TLU_N = {TLU_TRIG_N, TLU_RESET_N, TLU_BUSY_N, TLU_CONT_N, TLU_CLK_TX_N};
     wire [4:0] TLU_P;
-    assign TLU_P = {TLU_CLK_TX_P, TLU_CONT_P, TLU_BUSY_P, TLU_RESET_P, TLU_TRIG_P};
+    assign TLU_P = {TLU_TRIG_P, TLU_RESET_P, TLU_BUSY_P, TLU_CONT_P, TLU_CLK_TX_P};
 
     wire [4:0] LVDS_TLU_OUT;
-    assign LVDS_TLU_OUT = OUT1[31:26];
+    assign LVDS_TLU_OUT = OUT1[29:25];
     wire [4:0] LVDS_TLU_IN;
 
     genvar l;
@@ -500,7 +496,7 @@ module bdaq_core_throughput_test(
         end
     endgenerate
 
-    assign IN1[31:26] = LVDS_TLU_IN;
+    assign IN1[29:25] = LVDS_TLU_IN;
 
     // LVCMOS LOOPs
 

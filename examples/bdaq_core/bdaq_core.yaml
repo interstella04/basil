@@ -25,13 +25,13 @@ hw_drivers:
     type      : gpio
     interface : intf
     base_addr : 0x1080
-    size      : 8
+    size      : 32
 
   - name      : OUT2
     type      : gpio
     interface : intf
     base_addr : 0x10d0
-    size      : 8
+    size      : 32
 
   - name      : IN0
     type      : gpio
@@ -43,13 +43,13 @@ hw_drivers:
     type      : gpio
     interface : intf
     base_addr : 0x10a0
-    size      : 8
+    size      : 32
 
   - name      : IN2
     type      : gpio
     interface : intf
     base_addr : 0x1100
-    size      : 8
+    size      : 32
 
   - name      : FIFO
     type      : sitcp_fifo

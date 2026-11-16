@@ -131,15 +131,10 @@ class BDAQCoreTest(LoopBackTest):
         for bit, count in sorted(case.errors.items()):
             out_label = case.bit_names_out.get(bit, f"{case.out_field}[{bit}]")
             in_label = case.bit_names_in.get(bit, f"{case.in_field}[{bit}]")
-            if count == 0:
-                print(Fore.GREEN
-                  + f"Test PASSED: {out_label} -> {in_label}: "
-                  + Style.RESET_ALL)
-            else:
-                print(Fore.RED
-                  + f"ERROR summary: {out_label} -> {in_label}: "
-                  f"failed on {count} of {len(case.values)} values"
-                  + Style.RESET_ALL)
+            print(Fore.RED
+                + f"ERROR summary: {out_label} -> {in_label}: "
+                f"failed on {count} of {len(case.values)} values"
+                + Style.RESET_ALL)
 
     def bit_names(self, reg, fld, size):
         """ Small helper function to make registers() more readable
@@ -191,4 +186,10 @@ class BDAQCoreTest(LoopBackTest):
         return cases
 
 bdaq = BDAQCoreTest()
+#val = 0b01000
+#bdaq.write(register = "OUT2", field = "LVCMOS", value = val)
+#bdaq.chip["IN1"].read()
+#print(bin(val))
+#print(bin(int(bdaq.chip["IN2"]["LVCMOS"].tovalue())))
+
 bdaq.loop()
