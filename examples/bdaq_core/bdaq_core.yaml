@@ -96,7 +96,7 @@ registers:
     hw_driver   : OUT2
     size        : 32
     fields      :
-      - name    : LVCMOS # LVCMOS 0-5, 7
+      - name    : LVCMOS # RST0, LVCMOS 1-5, 7
         size    : 6
         offset  : 5
 
@@ -139,6 +139,6 @@ registers:
     hw_driver   : IN2
     size        : 32
     fields      :
-      - name    : LVCMOS # RST_B, VDDD_SENSE, TLU_SE_2-0, LVCMOS6
+      - name    : LVCMOS # LVCMOS0, VDDD_SENSE, TLU_SE_2-0, LVCMOS6
         size    : 6
         offset  : 5

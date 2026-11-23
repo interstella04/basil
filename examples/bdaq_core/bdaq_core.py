@@ -32,6 +32,7 @@ class LoopCase:
     bit_names_out: dict = field(default_factory=dict)
     bit_names_in: dict = field(default_factory=dict)
     errors: Counter = field(default_factory=Counter)
+    settle_time: float = 0.0   # seconds to wait between write and read
 
 class LoopBackTest():
 
@@ -85,6 +86,8 @@ class LoopBackTest():
         for case in cases:
             for value in case.values:
                 self.write(case.out_reg, case.out_field, value)
+                if case.settle_time:
+                    time.sleep(case.settle_time)
                 readout = self.read(case.in_reg, case.in_field)
                 self.compare(case, value, readout)
 
@@ -155,6 +158,8 @@ class BDAQCoreTest(LoopBackTest):
         regs = {r["name"]: r for r in self.conf} # 
         cases = []
 
+        settle_times = self.wiring.get("settle_time", {})
+
         for name, out_reg in regs.items():
             m = re.fullmatch(r"OUT(\d+)", name) # See if name matches OUTn pattern if not, m is None and loop continues 
             if not m:
@@ -182,14 +187,14 @@ class BDAQCoreTest(LoopBackTest):
                     size=fo["size"], values=self.parameters(fo["size"]),
                     bit_names_out=self.bit_names(name, fo["name"], fo["size"]),
                     bit_names_in=self.bit_names(in_name, fi["name"], fi["size"]),
+                    settle_time=settle_times.get(f"{name}.{fo['name']}", 0.0)
                 ))
         return cases
 
 bdaq = BDAQCoreTest()
-#val = 0b01000
-#bdaq.write(register = "OUT2", field = "LVCMOS", value = val)
-#bdaq.chip["IN1"].read()
-#print(bin(val))
-#print(bin(int(bdaq.chip["IN2"]["LVCMOS"].tovalue())))
+
+#val = 1
+
+#bdaq.write(register = 'OUT2', field = 'LVCMOS', value= val)
 
 bdaq.loop()

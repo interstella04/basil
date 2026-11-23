@@ -113,7 +113,7 @@ set_property PACKAGE_PIN E20 [get_ports LEMO_RX[1]]
 set_property IOSTANDARD LVCMOS25 [get_ports LEMO_RX*]
 
 # TLU
-# TLU RX CLK to MGT_REFCLK_0 (P / N inverted!) via CLK_SEL = 1
+# TLU RX CLK to MGT_REFCLK_0 (P / N inverted!) via CLK_  = 1
 set_property PACKAGE_PIN C21 [get_ports TLU_RESET_P]
 set_property PACKAGE_PIN B21 [get_ports TLU_RESET_N]
 set_property PACKAGE_PIN C21 [get_ports TLU_SPARE_P]
@@ -145,6 +145,9 @@ set_property PACKAGE_PIN AB26 [get_ports RST0]
 set_property PACKAGE_PIN AC26 [get_ports VDD_SNS_B]
 set_property IOSTANDARD LVCMOS25 [get_ports RST0]
 set_property IOSTANDARD LVCMOS25 [get_ports VDD_SNS_B]
+
+set_property PULLUP true [get_ports RST0]
+set_property PULLUP true [get_ports VDD_SNS_B]
 
 # SITCP
 set_property SLEW FAST [get_ports mdio_phy_mdc]
@@ -313,10 +316,10 @@ set_property PACKAGE_PIN D23 [get_ports {RJ45_P[0]}]
 set_property PACKAGE_PIN D24 [get_ports {RJ45_N[0]}]
 set_property PACKAGE_PIN E21 [get_ports {RJ45_P[1]}]
 set_property PACKAGE_PIN E22 [get_ports {RJ45_N[1]}]
-set_property PACKAGE_PIN D21 [get_ports {RJ45_P[2]}]
-set_property PACKAGE_PIN C22 [get_ports {RJ45_N[2]}]
-set_property PACKAGE_PIN F22 [get_ports {RJ45_P[3]}]
-set_property PACKAGE_PIN E23 [get_ports {RJ45_N[3]}]
+set_property PACKAGE_PIN F22 [get_ports {RJ45_P[2]}]
+set_property PACKAGE_PIN E23 [get_ports {RJ45_N[2]}]
+set_property PACKAGE_PIN D21 [get_ports {RJ45_P[3]}]
+set_property PACKAGE_PIN C22 [get_ports {RJ45_N[3]}]
 
 set_property IOSTANDARD LVDS_25 [get_ports {RJ45_P[*] RJ45_N[*]}]
 

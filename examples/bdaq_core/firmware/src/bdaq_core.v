@@ -41,7 +41,7 @@ module bdaq_core_throughput_test(
         input wire [3:0] RJ45_N,
         input wire [3:0] RJ45_P,
         inout wire [7:0] LVCMOS,
-        input wire RST0,
+        output wire RST0,
         input wire VDD_SNS_B,
         input wire TLU_CLK_TX_N, // TODO: won't work. Splits up to TLU_CLK_RX/TX_P/N
         input wire TLU_CLK_TX_P, // but TLU_CLK_RX_P/N doesn't go to FPGA
@@ -500,11 +500,11 @@ module bdaq_core_throughput_test(
 
     // LVCMOS LOOPs
 
-    assign LVCMOS[0] = OUT2[0];
-    assign IN2[0] = RST0;
+    assign RST0 = OUT2[0];
+    assign IN2[0] = ~LVCMOS[0];
 
     assign LVCMOS[1] = OUT2[1];
-    assign IN2[1] = VDD_SNS_B;
+    assign IN2[1] = ~VDD_SNS_B; // Invertec because of transistor
 
     assign LVCMOS[2] = OUT2[2];
     assign IN2[2] = TLU_SE[2];
